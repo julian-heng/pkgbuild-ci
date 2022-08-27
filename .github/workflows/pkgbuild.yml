@@ -1,0 +1,27 @@
+name: PKGBUILD CI
+
+on: [push, pull_request]
+
+jobs:
+  plasma-desktop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: julian-heng/svntogit-packages
+          ref: 'packages/plasma-desktop'
+          fetch-depth: 1
+      - name: Makepkg Build and Check
+        id: makepkg
+        uses: julian-heng/pkgbuild-action@import-gpg-keys
+        with:
+          pkgdir: 'trunk'
+      - name: Print Package Files
+        run: |
+          echo "Successfully created the following package archive"
+          echo "Package: ${{ steps.makepkg.outputs.pkgfile0 }}"
+      - name: Upload Package Archive
+        uses: actions/upload-artifact@v2
+        with:
+          path: ${{ steps.makepkg.outputs.pkgfile0 }}
